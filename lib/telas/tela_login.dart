@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../funcoes.dart';
 
 class TelaLogin extends StatefulWidget {
   @override
@@ -18,22 +19,44 @@ class _TelaLoginState extends State<TelaLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      backgroundColor: Theme.of(context).backgroundColor,
+      // backgroundColor: Theme.of(context).backgroundColor,
       // backgroundColor: Colors.amber,
 
       body: SingleChildScrollView(
+        padding: EdgeInsets.zero,
         child: Container(
+          height: 700,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              // image: AssetImage('assets/bg.jpeg'),
+              image: AssetImage('assets/bg1.png'),
+              colorFilter: ColorFilter.mode(Colors.blue, BlendMode.modulate),
+              fit: BoxFit.fill,
+            ),
+          ),
           padding: EdgeInsets.all(40),
           child: Form(
             key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Icon(
-                  Icons.login,
-                  size: 120,
-                  color: Theme.of(context).primaryColor,
+                Container(
+                  width: 190.0,
+                  height: 190.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      // fit: BoxFit.fill,
+                      image: AssetImage('assets/logo.jpeg'),
+                  // Image.asset('assets/logo.jpeg', width: 200, height: 200,)
+                    ),
                   ),
+                  ),
+                // Icon(
+                //   Icons.login,
+                //   size: 120,
+                //   color: Theme.of(context).primaryColor,
+                //   ),
 
                   campoTextoUser("Usuário", txtUser),
                   campoTextoPass("Senha", txtPass),
@@ -49,56 +72,7 @@ class _TelaLoginState extends State<TelaLogin> {
               ],
             )
           ),
-        )
-      ),
-    );
-  }
-
-  //
-  // CAMPO DE TEXTO
-  //
-  Widget campoTextoUser(rotulo, variavelControle) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5),
-      child: TextFormField(
-        controller: variavelControle,
-        style: TextStyle(fontSize: 18),
-        keyboardType: TextInputType.emailAddress,
-        decoration: InputDecoration(
-          labelText: rotulo,
-          labelStyle: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty || value.contains(' ')) {
-            return 'Usuário vazio ou incorreto!';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget campoTextoPass(rotulo, variavelControle) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5),
-      child: TextFormField(
-        controller: variavelControle,
-        obscureText: true,
-        style: TextStyle(fontSize: 18),
-        decoration: InputDecoration(
-          labelText: rotulo,
-          labelStyle: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Senha vazia ou incorreta!';
-          }
-          // Senha precisa ser no mínimo de 4 caracteres
-          else if (value.length <= 3) {
-            return 'Senha muito pequena!';
-          }
-          return null;
-        },
       ),
     );
   }
@@ -166,7 +140,7 @@ class _TelaLoginState extends State<TelaLogin> {
       alignment: Alignment.centerRight,
       // padding: EdgeInsets.only(top: 40),
       child: FlatButton(
-        child: Text(rotulo, style: TextStyle(color: Colors.black),
+        child: Text(rotulo, style: TextStyle(color: Colors.white),
         ),
         color: Colors.transparent,
         onPressed: () {
@@ -188,6 +162,7 @@ class _TelaLoginState extends State<TelaLogin> {
         child: Text(
           rotulo,
           textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white),
         ),
         onPressed: () {
           Navigator.pushNamed(context, '/telas/cadastrar');

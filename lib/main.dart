@@ -1,8 +1,9 @@
 import 'package:app_projeto/telas/cadastrar.dart';
+import 'package:app_projeto/telas/detalhes.dart';
+import 'package:app_projeto/telas/noticias.dart';
 import 'package:app_projeto/telas/recuper_senha.dart';
 import 'package:app_projeto/telas/tela_sobre.dart';
 import 'package:app_projeto/telas/tela_login.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -22,6 +23,8 @@ void main() {
       '/telas/tela_sobre': (context) => Tela01(),
       '/telas/recuper_senha': (context) => RecuperaSenha(),
       '/telas/cadastrar': (context) => TelaCadastro(),
+      '/telas/noticias': (context) => Noticias(),
+      '/telas/detalhes': (context) => Detalhes(),
     },
   ),
   );
