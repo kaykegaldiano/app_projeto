@@ -1,4 +1,4 @@
-# Tech Blue
+# Tech Blu
 
 Aplicativo de Notícias de Tecnologia.
 
