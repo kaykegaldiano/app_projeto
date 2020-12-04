@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:app_projeto/model/usuarios.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TelaCadastro extends StatefulWidget {
@@ -14,8 +18,32 @@ class _TelaCadastroState extends State<TelaCadastro> {
   TextEditingController txtNome = TextEditingController();
   TextEditingController txtPass = TextEditingController();
 
+  var db = FirebaseFirestore.instance;
+
+  // Lista Dinâmica de objetos da classe Usuarios
+  List<Usuarios> usersList = List();
+
+  // Declaração de um objeto "ouvinte" da coleção  usuarios do Firestore
+  StreamSubscription<QuerySnapshot> listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    //cancelar o ouvidor, caso a coleção esteja vazia.
+    listener?.cancel();
+
+    listener = db.collection("usuarios").snapshots().listen((res) {
+
+      setState(() {
+      usersList = res.docs.map((e) => Usuarios.fromMap(e.data(), e.id)).toList();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -69,8 +97,10 @@ class _TelaCadastroState extends State<TelaCadastro> {
               SizedBox(
                 height: 10,
               ),
+
+              // CAMPO NOME
       TextFormField(
-          // autofocus: true,
+           autofocus: true,
           controller: txtNome,
           keyboardType: TextInputType.text,
           decoration: InputDecoration(
@@ -92,6 +122,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
       SizedBox(
           height: 10
       ),
+
+      // CAMPO EMAIL
       TextFormField(
           controller: txtEmail,
           keyboardType: TextInputType.emailAddress,
@@ -114,6 +146,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
       SizedBox(
           height: 10,
       ),
+
+      // CAMPO SENHA
       TextFormField(
           controller: txtPass,
           keyboardType: TextInputType.text,
@@ -140,6 +174,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
       SizedBox(
           height: 10,
       ),
+
+      // BOTÃO CADASTRAR
       Container(
           height: 60,
           alignment: Alignment.centerLeft,
@@ -165,9 +201,27 @@ class _TelaCadastroState extends State<TelaCadastro> {
                 ),
               ),
               onPressed: () {
+
+                String nome = txtNome.text;
+                String email = txtEmail.text;
+                String senha = txtPass.text;
+                
                 if (formKey.currentState.validate()) {
-                  setState(() {
-                    caixaDialogo("Um link com a confirmação de e-mail foi enviado no e-mail ${txtEmail.text}.\nFavor verificar a Caixa de Entrada e/ou Spam");
+                  setState(() async {
+                  //ADICIONAR um novo DOCUMENTO a COLEÇÃO
+                  await db.collection("usuarios").add(
+                    {
+                      "nome": nome,
+                      "email": email,
+                      "senha": senha,
+                    }
+                  );
+                    //caixaDialogo("Um link com a confirmação de e-mail foi enviado no e-mail ${txtEmail.text}.\nFavor verificar a Caixa de Entrada e/ou Spam");
+                    caixaDialogo("Usuário criado com sucesso!");
+
+                    txtNome.clear();
+                    txtEmail.clear();
+                    txtPass.clear();
                   });
                 }
               },
@@ -177,6 +231,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
       SizedBox(
           height: 10,
       ),
+
+      // BOTÃO CANCELAR
       Container(
           height: 40,
           alignment: Alignment.center,

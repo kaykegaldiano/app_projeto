@@ -1,12 +1,19 @@
+import 'package:app_projeto/telas/adicionar_noticia.dart';
 import 'package:app_projeto/telas/cadastrar.dart';
 import 'package:app_projeto/telas/detalhes.dart';
-import 'package:app_projeto/telas/noticias.dart';
+import 'package:app_projeto/telas/tela_noticias.dart';
 import 'package:app_projeto/telas/recuper_senha.dart';
 import 'package:app_projeto/telas/tela_sobre.dart';
 import 'package:app_projeto/telas/tela_login.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async{
+
+  //Registrar o Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     title: 'Projeto App',
@@ -25,6 +32,7 @@ void main() {
       '/telas/cadastrar': (context) => TelaCadastro(),
       '/telas/noticias': (context) => Noticias(),
       '/telas/detalhes': (context) => Detalhes(),
+      '/telas/adicionar_noticia': (context) => AdicionarNoticia(),
     },
   ),
   );

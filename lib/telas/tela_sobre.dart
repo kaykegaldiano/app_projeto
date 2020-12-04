@@ -17,11 +17,6 @@ class _Tela01State extends State<Tela01> {
     // RECUPERAR OS DADOS DA TELA PRINCIPAL
     //
     Map dados = ModalRoute.of(context).settings.arguments;
-    // String user;
-
-    // if (dados != null) {
-    //   user = dados['user'].text;
-    // }
 
     _callFacebook() async {
   var fbProtocolUrl = "fb://profile/100003909031205";
@@ -77,15 +72,15 @@ class _Tela01State extends State<Tela01> {
                 "Bem-vindo, ${dados['user']}!",
                 style: TextStyle(color: Colors.white,),
                 ),
-              accountEmail: null, //Text("kaykegaldiano@gmail.com"),
-              currentAccountPicture: CircleAvatar(
+              accountEmail: Text(dados['email']), //Text("kaykegaldiano@gmail.com"),
+              /*currentAccountPicture: CircleAvatar(
                 radius: 30.0,
                 backgroundImage:
                 NetworkImage(
                   "https://instagram.fcgh14-1.fna.fbcdn.net/v/t51.2885-19/s150x150/93767281_938085866625167_5632983925216247808_n.jpg?_nc_ht=instagram.fcgh14-1.fna.fbcdn.net&_nc_ohc=bQgOwwpnM9AAX_ILt8a&oh=218691797ec6c18f8212ea8b2ce31431&oe=5F95E96C"
                   ),
                   backgroundColor: Colors.transparent,
-              ),
+              ),*/
               ),
               ListTile(
               leading: Icon(Icons.new_releases_rounded),

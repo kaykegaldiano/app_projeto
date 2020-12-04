@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:app_projeto/model/usuarios.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class RecuperaSenha extends StatefulWidget {
@@ -11,6 +15,30 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
   var formKey = GlobalKey<FormState>();
 
   TextEditingController txtEmail = TextEditingController();
+
+  var db = FirebaseFirestore.instance;
+
+  // Lista Dinâmica de objetos da classe Usuarios
+  List<Usuarios> usersList = List();
+
+  // Declaração de um objeto "ouvinte" da coleção  usuarios do Firestore
+  StreamSubscription<QuerySnapshot> listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    //cancelar o ouvidor, caso a coleção esteja vazia.
+    listener?.cancel();
+
+    listener = db.collection("usuarios").snapshots().listen((res) {
+
+      setState(() {
+      usersList = res.docs.map((e) => Usuarios.fromMap(e.data(), e.id)).toList();
+
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +84,7 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
                 height: 10,
               ),
               Text(
-                "Por favor, informe o E-mail associado a sua conta que enviaremos um link para o mesmo com instruções para restauração de sua senha.",
+                "Por favor, informe o E-mail associado a sua conta para que possamos recuperar sua senha.",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
@@ -117,9 +145,23 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
                   ),
 
                 onPressed: () {
+
+                  String email = txtEmail.text;
+                  bool validar = false;
+
                   if (formKey.currentState.validate()) {
                     setState(() {
-                      caixaDialogo("Um link de recuperação de senha foi enviado para o e-mail ${txtEmail.text}.\nPor favor verifique a Caixa de Entrada e/ou Spam.");
+                      usersList.forEach((element) {
+                        if (email == element.email) {
+                          validar = true;
+                          caixaDialogo("A senha do e-mail $email é ${element.senha}");
+                          //caixaDialogo("Um link de recuperação de senha foi enviado para o e-mail ${txtEmail.text}.\nPor favor verifique a Caixa de Entrada e/ou Spam.");
+                        }
+                      });
+
+                      if (!validar) {
+                        caixaDialogo("E-mail não cadastrado!");
+                      }
                     });
                   }
                 },
@@ -144,7 +186,7 @@ class _RecuperaSenhaState extends State<RecuperaSenha> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Aviso", style: TextStyle(fontSize: 16),),
+          title: Text("Aviso", style: TextStyle(fontSize: 16, color: Colors.red,)),
           content: Text(msg, style: TextStyle(fontSize: 16)),
           actions: [
             FlatButton(

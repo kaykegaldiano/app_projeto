@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:app_projeto/model/usuarios.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../funcoes.dart';
 
@@ -12,8 +16,34 @@ class _TelaLoginState extends State<TelaLogin> {
   var formKey = GlobalKey<FormState>();
 
   // Armazenar valores do user e pass
+  TextEditingController txtName = TextEditingController();
   TextEditingController txtUser = TextEditingController();
   TextEditingController txtPass = TextEditingController();
+
+  var db = FirebaseFirestore.instance;
+
+  // Lista Dinâmica de objetos da classe Usuarios
+  List<Usuarios> usersList = List();
+
+
+  // Declaração de um objeto "ouvinte" da coleção  usuarios do Firestore
+  StreamSubscription<QuerySnapshot> listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    //cancelar o ouvidor, caso a coleção esteja vazia.
+    listener?.cancel();
+
+    listener = db.collection("usuarios").snapshots().listen((res) {
+
+      setState(() {
+      usersList = res.docs.map((e) => Usuarios.fromMap(e.data(), e.id)).toList();
+
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +52,15 @@ class _TelaLoginState extends State<TelaLogin> {
       // backgroundColor: Theme.of(context).backgroundColor,
       // backgroundColor: Colors.amber,
 
-      body: SingleChildScrollView(
+      body: StreamBuilder<QuerySnapshot>(
+        stream: db.collection("usuarios").snapshots(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Center(child: Text("Erro ao conectar no FireBase"),);
+            case ConnectionState.waiting:
+              return Center(child: CircularProgressIndicator());
+          default: return SingleChildScrollView(
         padding: EdgeInsets.zero,
         child: Container(
           height: 700,
@@ -58,7 +96,7 @@ class _TelaLoginState extends State<TelaLogin> {
                 //   color: Theme.of(context).primaryColor,
                 //   ),
 
-                  campoTextoUser("Usuário", txtUser),
+                  campoTextoUser("E-mail", txtUser),
                   campoTextoPass("Senha", txtPass),
                   forgotPass("Recuperar Senha"),
                   SizedBox(
@@ -73,7 +111,11 @@ class _TelaLoginState extends State<TelaLogin> {
             )
           ),
         ),
-      ),
+
+          );
+        }
+        }
+      )
     );
   }
 
@@ -117,12 +159,35 @@ class _TelaLoginState extends State<TelaLogin> {
           ],
           ),
         onPressed: () {
+
+          String email = txtUser.text;
+          String senha = txtPass.text;
+          String nome = txtName.text;
+
+          bool validar = false;
+
+          debugPrint('listaDeUsuarios: $usersList');
+
           if (formKey.currentState.validate()) {
             setState(() {
-            // String user = txtUser.text;
+
+            usersList.forEach((element) {
+              if (email == element.email && senha == element.senha) {
+                nome = element.nome;
+                validar = true;
+              }
+            });
+            
+            if (validar) {
             var dados = Map();
-            dados['user'] = txtUser.text;
+            dados['user'] = nome;
+            dados['email'] = email;
             Navigator.pushNamed(context, '/telas/tela_sobre', arguments: dados);
+            }
+            else {
+              caixaDialogo("Usuário / Senha incorreto ou inexistente!");
+            }
+
 
             });
           }
@@ -169,5 +234,28 @@ class _TelaLoginState extends State<TelaLogin> {
         },
       ),
     );
+  }
+
+  //
+  // CAIXA DE DIALOGO
+  //
+  caixaDialogo(msg) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Aviso", style: TextStyle(fontSize: 16, color: Colors.red,)),
+          content: Text(msg, style: TextStyle(fontSize: 16)),
+          actions: [
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                },
+                child: Text('Entendi'),
+            )
+          ],
+        );
+      }
+      );
   }
 }
